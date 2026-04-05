@@ -438,8 +438,7 @@ async def render_group_events_image_playwright(
             "() => Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)"
         )
         await page.set_viewport_size({"width": 980, "height": int(height)})
-        with open("测试.html", "w", encoding="utf8") as f:
-            f.write(html)
+
         png = await page.screenshot(full_page=True, type="png")
         await browser.close()
         return png
