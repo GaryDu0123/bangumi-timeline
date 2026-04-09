@@ -2,7 +2,11 @@
 
 HoshinoBot 的 Bangumi 时间线订阅插件。
 
-插件支持按群订阅 Bangumi 用户，定时抓取这些用户最近的时间线动态，并将合并后的动态渲染为图片推送到群内。
+按群订阅 Bangumi 用户，定时抓取这些用户最近的时间线动态，并将合并后的动态渲染为图片推送到群内。
+
+<img  height="260" alt="0fe7ccfd2d30cf956f9d5ee0ee61d18c" src="https://github.com/user-attachments/assets/aba75372-abbe-4ad0-af12-3214ce35c6a2" />
+<img height="260" alt="2b951b8b747403a137da780f8cf12f3f" src="https://github.com/user-attachments/assets/50192848-0a38-46c4-8b01-dd85b8134d2d" />
+
 
 ## 功能特性
 
