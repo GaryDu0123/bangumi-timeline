@@ -4,7 +4,7 @@ import json
 
 from typing import Tuple
 
-from hoshino import Service
+from hoshino import Service, priv
 from . import config
 from .http_client import HttpClient
 from . import storage
@@ -145,6 +145,10 @@ async def bangumi_job():
         )
 
 
-@sv.on_fullmatch("bgmtest")
-async def bangumi_test(bot, ev):
-    await bangumi_job()
+# @sv.on_fullmatch("bgmtest")
+# async def bangumi_test(bot, ev):
+#     # 检查权限
+#     if not priv.check_priv(ev, priv.ADMIN):
+#         # ignore
+#         return
+#     await bangumi_job()
