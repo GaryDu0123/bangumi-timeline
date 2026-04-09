@@ -1,17 +1,12 @@
 # hoshino/modules/bangumi/poller.py
 import asyncio
 import base64
-import io
 import time
-from collections import defaultdict
 from typing import Dict, Any, List, Callable, Coroutine, Awaitable
-
-from PIL import ImageFont, Image, ImageDraw
-
 from . import config
 from .models import BangumiEvent
 from .render import render_group_events_image_playwright
-from .timeline import BangumiTimelineClient, BangumiRSSClient
+from .timeline import BangumiTimelineClient
 from ... import get_bot
 
 
