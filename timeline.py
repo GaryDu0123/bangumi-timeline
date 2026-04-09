@@ -1,7 +1,3 @@
-# hoshino/modules/bangumi/timeline.py
-import xml.etree.ElementTree as ET
-import email.utils
-import re
 import time
 import json
 from typing import List,  Tuple
@@ -118,48 +114,3 @@ class BangumiTimelineClient:
         comment_str = comment.strip() if isinstance(comment, str) and comment.strip() else ""
 
         return rating, comment_str
-
-class BangumiRSSClient:
-    pass
-# class BangumiRSSClient:
-#     def __init__(self, fetch_text):
-#         self.base = config.BANGUMI_URL
-#         self.fetch_text = fetch_text
-#
-#     async def fetch_events(self, user_key: str) -> List[BangumiEvent]:
-#         url = f"{self.base}/feed/user/{user_key}/timeline"
-#         xml = await self.fetch_text(url)
-#         return self._parse(xml, user_key)
-#
-#     def _parse(self, xml_text: str, user_key: str) -> List[BangumiEvent]:
-#         root = ET.fromstring(xml_text)
-#         ch = root.find("channel")
-#         if ch is None:
-#             return []
-#
-#         out: List[BangumiEvent] = []
-#         for item in ch.findall("item"):
-#             link = (item.findtext("link") or "").strip()
-#             guid = (item.findtext("guid") or link or "").strip()
-#             pub = (item.findtext("pubDate") or "").strip()
-#
-#             ts = 0
-#             try:
-#                 ts = int(email.utils.mktime_tz(email.utils.parsedate_tz(pub)))
-#             except Exception:
-#                 ts = 0
-#
-#             eid = f"{user_key}:rss:{guid or ts}"
-#             out.append(BangumiEvent(
-#                 time=eid,
-#                 user_key=user_key,
-#                 ts=ts,
-#                 source="rss",
-#                 kind="unknown",
-#                 url=link or self.base,
-#                 rating="",
-#                 comment="",
-#             ))
-#
-#         out.sort(key=lambda e: e.ts, reverse=True)
-#         return out
