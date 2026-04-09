@@ -21,7 +21,4 @@ class BangumiEvent:
     time: str
     user_key: str             # epoch seconds，用于全局排序
     source: Source
-    # kind: Kind
-    # rating: str            # "" 表示无评分
-    # comment: str           # "" 表示无短评/吐槽
-    bangumi_timeline_info: BangumiTimelineInfo  # timeline 专用，rss 事件该字段留空
+    bangumi_timeline_info: BangumiTimelineInfo  # timeline 专用，
