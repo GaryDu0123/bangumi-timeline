@@ -1,4 +1,4 @@
-# bangumi
+# bangumi-timeline
 
 HoshinoBot 的 Bangumi 时间线订阅插件。
 
