@@ -20,7 +20,8 @@ class HttpClient:
 
     async def get_text(self, url: str) -> str:
         assert self._sess is not None
-        async with self._sess.get(url, timeout=config.TIMEOUT_SEC) as resp:
+        proxy = (config.PROXY_URL or "").strip() or None
+        async with self._sess.get(url, timeout=config.TIMEOUT_SEC, proxy=proxy) as resp:
             resp.raise_for_status()
             return await resp.text()
 

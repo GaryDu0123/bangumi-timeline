@@ -80,6 +80,7 @@ playwright install chromium
 - `DATA_DIRNAME`：数据目录名
 - `SUBS_FILENAME`：订阅存储文件名
 - `NICKNAME_FILENAME`：昵称缓存文件名
+- `PROXY_URL`：代理, bangumi目前有时需要代理访问
 
 ## 使用命令
 
@@ -165,4 +166,3 @@ bgm update nickname <用户名>
 
 ## todo
 1. 添加bangumi登录来显示非全年龄内容
-2. 动态和创建条目等项目的渲染还未经过完全测试

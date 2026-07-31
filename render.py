@@ -1,5 +1,8 @@
+import base64
 import html as _html
+from pathlib import Path
 from typing import List
+from urllib.parse import urljoin
 
 from bs4 import NavigableString, BeautifulSoup
 from playwright.async_api import async_playwright
@@ -9,8 +12,24 @@ from . import config
 from .storage import load_nickname
 
 
+_RATE_STAR_PATH = Path(__file__).with_name("assets") / "rate_star_2x.png"
+_RATE_STAR_DATA_URI = (
+    "data:image/png;base64,"
+    + base64.b64encode(_RATE_STAR_PATH.read_bytes()).decode("ascii")
+)
+
+
 def _safe(s: str) -> str:
     return _html.escape((s or "").strip())
+
+
+def _normalize_resource_url(url: str) -> str:
+    url = (url or "").strip()
+    if not url:
+        return url
+    if url.startswith("//"):
+        return "https:" + url
+    return urljoin(config.BANGUMI_URL.rstrip("/") + "/", url)
 
 
 
@@ -35,9 +54,12 @@ async def render_group_events_image_playwright(
             info_full.insert(0, NavigableString(" "))
             info_full.insert(0, strong_tag)
 
+        for img in soup.find_all("img"):
+            src = img.get("src")
+            if src:
+                img["src"] = _normalize_resource_url(src)
+
         raw_block = str(soup)
-        raw_block = raw_block.replace('src="//', 'src="https://')
-        raw_block = raw_block.replace("src='//", "src='https://")
 
         items_html.append(f"""
         <div class="row">
@@ -326,7 +348,7 @@ async def render_group_events_image_playwright(
           top: 0;
           width: var(--total-w);
           height: var(--star-h);
-          background-image: url("https://bangumi.tv/img/ico/rate_star_2x.png");
+          background-image: url("{_RATE_STAR_DATA_URI}");
           background-repeat: repeat-x;
           background-size: var(--star-w) 19.5px;
           background-position: 0 100%;
@@ -340,7 +362,7 @@ async def render_group_events_image_playwright(
           top: 0;
           width: var(--fill);
           height: var(--star-h);
-          background-image: url("https://bangumi.tv/img/ico/rate_star_2x.png");
+          background-image: url("{_RATE_STAR_DATA_URI}");
           background-repeat: repeat-x;
           background-size: var(--star-w) 19.5px;
           background-position: 0 0;
@@ -414,7 +436,19 @@ async def render_group_events_image_playwright(
     """
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])
+        proxy = (
+            getattr(config, "PLAYWRIGHT_PROXY_URL", None)
+            or getattr(config, "PROXY_URL", None)
+            or ""
+        ).strip() or None
+        launch_options = {
+            "headless": True,
+            "args": ["--no-sandbox", "--disable-dev-shm-usage"],
+        }
+        if proxy:
+            launch_options["proxy"] = {"server": proxy}
+
+        browser = await p.chromium.launch(**launch_options)
         context = await browser.new_context(viewport={"width": 980, "height": 10}, device_scale_factor=2)
         # browser = await p.chromium.launch(
         #     executable_path="C:\Program Files\Google\Chrome\Application\chrome.exe",
@@ -431,14 +465,35 @@ async def render_group_events_image_playwright(
             "User-Agent": getattr(config, "USER_AGENT", "Mozilla/5.0"),
         })
 
-        page = await context.new_page()
-        await page.set_content(html, wait_until="networkidle")
+        try:
+            page = await context.new_page()
+            await page.set_content(
+                html,
+                wait_until="domcontentloaded",
+                timeout=getattr(config, "RENDER_TIMEOUT_MS", 30000),
+            )
+            await page.wait_for_timeout(getattr(config, "RENDER_READY_DELAY_MS", 500))
+            await page.evaluate(
+                """
+                timeout => Promise.race([
+                    Promise.all(Array.from(document.images).map(img => {
+                        if (img.complete) return Promise.resolve();
+                        return new Promise(resolve => {
+                            img.addEventListener("load", resolve, { once: true });
+                            img.addEventListener("error", resolve, { once: true });
+                        });
+                    })),
+                    new Promise(resolve => setTimeout(resolve, timeout))
+                ])
+                """,
+                getattr(config, "RENDER_IMAGE_WAIT_MS", 5000),
+            )
 
-        height = await page.evaluate(
-            "() => Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)"
-        )
-        await page.set_viewport_size({"width": 980, "height": int(height)})
+            height = await page.evaluate(
+                "() => Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)"
+            )
+            await page.set_viewport_size({"width": 980, "height": int(height)})
 
-        png = await page.screenshot(full_page=True, type="png")
-        await browser.close()
-        return png
+            return await page.screenshot(full_page=True, type="png")
+        finally:
+            await browser.close()

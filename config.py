@@ -5,7 +5,13 @@ POLL_MINUTES = 60         # Hoshino scheduled_job interval
 
 # ===== Network =====
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36"
-TIMEOUT_SEC = 15
+TIMEOUT_SEC = 30
+PROXY_URL = ""                 # Optional proxy, e.g. "http://127.0.0.1:7890"
+PLAYWRIGHT_PROXY_URL = PROXY_URL  # Optional render proxy override. None uses PROXY_URL.
+RENDER_TIMEOUT_MS = 30000
+RENDER_READY_DELAY_MS = 500
+RENDER_IMAGE_WAIT_MS = 5000
+
 CONCURRENCY = 3                   # 并发抓取用户事件上限（避免被站点限流）
 
 # ===== Sites =====

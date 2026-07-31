@@ -145,10 +145,10 @@ async def bangumi_job():
         )
 
 
-# @sv.on_fullmatch("bgmtest")
-# async def bangumi_test(bot, ev):
-#     # 检查权限
-#     if not priv.check_priv(ev, priv.ADMIN):
-#         # ignore
-#         return
-#     await bangumi_job()
+@sv.on_fullmatch("bgmtest")
+async def bangumi_test(bot, ev):
+    # 检查权限
+    if not priv.check_priv(ev, priv.ADMIN):
+        # ignore
+        return
+    await bangumi_job()
